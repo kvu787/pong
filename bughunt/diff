@@ -1,0 +1,26 @@
+11c11
+< package maine
+---
+> package main
+14c14
+< import "fm"
+---
+> import "fmt"
+32,33c32,33
+< 		Vector{X: , Y: 3},
+< 		
+---
+> 		Vector{X: -1, Y: 3},
+> 		Vector{X: 3, Y: 5},
+39c39
+< 	for i = 0; i <= len(vectors); i++ {
+---
+> 	for i = 0; i < len(vectors); i++ {
+64c64
+< 	X  // Declare what fields and types this 'struct' will contain
+---
+> 	X int // Declare what fields and types this 'struct' will contain
+80c80
+< 	resultVector.Y = v1 + v2.Y
+---
+> 	resultVector.Y = v1.Y + v2.Y
