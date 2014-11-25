@@ -15,21 +15,22 @@ func main() {
 	/*****************/
 
 	WINDOW = Rectangle_s{
-		Position: Vector_s{X: 320, Y: 240},
-		Width:    640,
-		Height:   480,
+		Position: Vector_s{X: 400, Y: 300},
+		Width:    800,
+		Height:   600,
 	}
 	SF_WINDOW = SetupWindow(int(WINDOW.Width), int(WINDOW.Height))
 	FPS = 63
 	FRAME_DURATION = SecondsToDuration(1.0 / float64(FPS))
 	CURRENT_FRAME_START_TIME = time.Now()
+	PADDLE_OFFSET = 50
 	PLAYER =
 		Paddle_s{
 			Rectangle: Rectangle_s{
 				Position: Vector_s{
 					X: PADDLE_OFFSET,
 					Y: WINDOW.Height / 2},
-				Width:  25,
+				Width:  20,
 				Height: 100},
 			Speed: 300}
 	AI =
@@ -38,7 +39,7 @@ func main() {
 				Position: Vector_s{
 					X: WINDOW.Width - PADDLE_OFFSET,
 					Y: WINDOW.Height / 2},
-				Width:  25,
+				Width:  20,
 				Height: 100},
 			Speed: 150}
 	BALL =
@@ -47,14 +48,13 @@ func main() {
 				Position: Vector_s{
 					X: WINDOW.Width / 2,
 					Y: WINDOW.Height / 2},
-				Radius: 10},
-			Velocity: NewPolar(400, math.Pi*0.7)}
+				Radius: 5},
+			Velocity: NewPolar(300, math.Pi*0.05)}
 	INPUT =
 		Input_s{
 			IsUpArrowClicked:   false,
 			IsDownArrowClicked: false,
 			IsWindowClosed:     false}
-	PADDLE_OFFSET = 50
 
 	runtime.LockOSThread()
 
@@ -72,8 +72,10 @@ func main() {
 
 		// update game objects
 		PLAYER = MovePlayer(INPUT, FRAME_DURATION, PLAYER)
+		PLAYER = KeepPlayerInBoundary(PLAYER, WINDOW)
 		AI = MoveAi(AI, BALL, FRAME_DURATION)
-		BALL = CollidePlayerBall(PLAYER, BALL, 2)
+		BALL = CollidePaddleBall(PLAYER, BALL, 4, DegreesToRadians(20.0))
+		BALL = CollidePaddleBall(AI, BALL, 4, DegreesToRadians(20.0))
 		BALL = CollideBoundaryBall(WINDOW, BALL)
 		BALL = ApplyVelocityBall(BALL, FRAME_DURATION)
 

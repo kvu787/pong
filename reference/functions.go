@@ -64,6 +64,10 @@ func VectorScale(magnitude float64, v Vector_s) Vector_s {
 	return VectorMul(magnitude/VectorMagnitude(v), v)
 }
 
+func DegreesToRadians(deg float64) float64 {
+	return deg / 360.0 * (2 * math.Pi)
+}
+
 /*********************/
 /*** INTERSECTIONS ***/
 /*********************/
@@ -120,6 +124,16 @@ func IsPointInsideRectangle(v Vector_s, r Rectangle_s) bool {
 /************/
 /*** MISC ***/
 /************/
+
+func Clamp(min float64, val float64, max float64) float64 {
+	if val < min {
+		return min
+	} else if val > max {
+		return max
+	} else {
+		return val
+	}
+}
 
 func RectangleSegments(r Rectangle_s) [4]Segment_s {
 	var corners [4]Vector_s = RectangleCorners(r)
