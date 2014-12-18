@@ -20,28 +20,28 @@ func main() {
 		Height:   600,
 	}
 	SF_WINDOW = SetupWindow(int(WINDOW.Width), int(WINDOW.Height))
-	FPS = 63
+	FPS = 120
 	FRAME_DURATION = SecondsToDuration(1.0 / float64(FPS))
 	CURRENT_FRAME_START_TIME = time.Now()
-	PADDLE_OFFSET = 50
+	PADDLE_OFFSET = 60
 	PLAYER =
 		Paddle_s{
 			Rectangle: Rectangle_s{
 				Position: Vector_s{
 					X: PADDLE_OFFSET,
 					Y: WINDOW.Height / 2},
-				Width:  20,
-				Height: 100},
-			Speed: 300}
+				Width:  10,
+				Height: 80},
+			Speed: 500}
 	AI =
 		Paddle_s{
 			Rectangle: Rectangle_s{
 				Position: Vector_s{
 					X: WINDOW.Width - PADDLE_OFFSET,
 					Y: WINDOW.Height / 2},
-				Width:  20,
-				Height: 100},
-			Speed: 150}
+				Width:  10,
+				Height: 80},
+			Speed: 300}
 	BALL =
 		Ball_s{
 			Circle: Circle_s{
@@ -49,7 +49,7 @@ func main() {
 					X: WINDOW.Width / 2,
 					Y: WINDOW.Height / 2},
 				Radius: 5},
-			Velocity: NewPolar(300, math.Pi*0.05)}
+			Velocity: NewPolar(700, math.Pi*0.05)}
 	INPUT =
 		Input_s{
 			IsUpArrowClicked:   false,
@@ -62,7 +62,7 @@ func main() {
 	/*** RUN RELATIONS ***/
 	/*********************/
 
-	for {
+	for { // game loop
 		// handle timing
 		CURRENT_FRAME_START_TIME = UpdateCurrentFrameStartTime()
 
@@ -88,6 +88,13 @@ func main() {
 
 		// handle timing
 		CURRENT_FRAME_DURATION = UpdateCurrentFrameDuration(CURRENT_FRAME_START_TIME)
-		Sync(FRAME_DURATION, CURRENT_FRAME_DURATION)
+		Sleep(FRAME_DURATION, CURRENT_FRAME_DURATION)
 	}
 }
+
+/* Pong collision model 3
+
+if paddle is ball_diameter away from the boundary
+after collisions, the ball must be CLEAR of the danger zone
+
+*/

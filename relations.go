@@ -73,7 +73,7 @@ func UpdateCurrentFrameDuration(startTime time.Time) time.Duration {
 	return time.Since(startTime)
 }
 
-func Sync(frameDuration time.Duration, currentFrameDuration time.Duration) {
+func Sleep(frameDuration time.Duration, currentFrameDuration time.Duration) {
 	var sleepDuration time.Duration = frameDuration - currentFrameDuration
 	time.Sleep(sleepDuration)
 }
@@ -84,28 +84,46 @@ func CollidePaddleBall(player Paddle_s, ball Ball_s, offset float64, angleVarian
 	for i = 0; i < 4; i++ {
 		var paddleSide Segment_s = paddleSides[i]
 		if AreCircleSegmentIntersecting(ball.Circle, paddleSide) {
-			ball.Velocity = VectorMul(-1, ball.Velocity)
+			if i%2 == 0 {
+				// long sides
 
-			// vary the velocity somewhat
-			var variance float64 = (rand.Float64() * angleVarianceRange) - angleVarianceRange/2.0
-			ball.Velocity = VectorRotate(ball.Velocity, variance)
+				var resultant Vector_s = something(paddleSide, ball.Circle.Position)
+				resultant = VectorScale(VectorMagnitude(ball.Velocity), resultant)
+				ball.Velocity = resultant
+			} else {
+				// short sides
+
+				ball.Velocity = VectorMul(-1, ball.Velocity)
+
+				// randomize velocity direction
+				var offset float64 = (rand.Float64() * DegreesToRadians(160)) - DegreesToRadians(80)
+				var rejection = PerpendicularVectorFromLineToPoint(paddleSide, ball.Circle.Position)
+				rejection = VectorScale(VectorMagnitude(ball.Velocity), rejection)
+				rejection = VectorRotate(rejection, offset)
+				ball.Velocity = rejection
+			}
 
 			// separate the segment and the circle
-			var perpendicular Vector_s = PerpendicularVectorFromSegmentToPoint(paddleSide, ball.Circle.Position)
+			var perpendicular Vector_s = PerpendicularVectorFromLineToPoint(paddleSide, ball.Circle.Position)
 			var separation float64 = ball.Circle.Radius - VectorMagnitude(perpendicular)
 			ball.Circle.Position = VectorAdd(ball.Circle.Position, VectorScale(separation+offset, perpendicular))
 		}
 	}
-
 	return ball
 }
 
-// // boundaries are x offsets, ex: (10, 190)
-// func ClampBall(leftBoundary float64, rightBoundary float64, ball Ball_s) Ball_s {
-// 	leftBoundary += ball.Circle.Radius
-// 	rightBoundary -= ball.Circle.Radius
-// 	ball.Circle.Position.X = Clamp(leftBoundary, val, rightBoundary)
-// }
+func something(s Segment_s, p Vector_s) Vector_s {
+	var offsets [8]float64 = [8]float64{20, 40, 60, 80, 100, 120, 140, 160}
+	var endpoint Vector_s = s.Start
+	var segmentVector = VectorSub(s.Start, s.End)
+	var b Vector_s = PerpendicularVectorFromLineToPoint(s, p)
+	var pointOnLine Vector_s = VectorSub(p, b)
+	var distanceFromEnd float64 = VectorMagnitude(VectorSub(pointOnLine, endpoint))
+	var sectionLength float64 = SegmentLength(s) / float64(len(offsets))
+	var offsetIndex int = Floor(distanceFromEnd / sectionLength)
+	var xProduct float64 = NormalizeScalar(VectorCrossProduct(segmentVector, b))
+	return VectorNormalize(VectorRotate(segmentVector, xProduct*DegreesToRadians(offsets[offsetIndex])))
+}
 
 func CollideBoundaryBall(window Rectangle_s, ball Ball_s) Ball_s {
 	var boundarySides [4]Segment_s = RectangleSegments(window)

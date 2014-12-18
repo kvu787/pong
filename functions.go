@@ -64,6 +64,14 @@ func VectorScale(magnitude float64, v Vector_s) Vector_s {
 	return VectorMul(magnitude/VectorMagnitude(v), v)
 }
 
+func VectorCrossProduct(v1 Vector_s, v2 Vector_s) float64 {
+	return v1.X*v2.Y - v1.Y*v2.X
+}
+
+func VectorNormalize(v Vector_s) Vector_s {
+	return VectorScale(1, v)
+}
+
 func DegreesToRadians(deg float64) float64 {
 	return deg / 360.0 * (2 * math.Pi)
 }
@@ -125,6 +133,18 @@ func IsPointInsideRectangle(v Vector_s, r Rectangle_s) bool {
 /*** MISC ***/
 /************/
 
+func NormalizeScalar(k float64) float64 {
+	return k / math.Abs(k)
+}
+
+func SegmentLength(s Segment_s) float64 {
+	return VectorMagnitude(VectorSub(s.End, s.Start))
+}
+
+func Floor(x float64) int {
+	return int(x)
+}
+
 func Clamp(min float64, val float64, max float64) float64 {
 	if val < min {
 		return min
@@ -162,7 +182,11 @@ func RectangleCorners(r Rectangle_s) [4]Vector_s {
 	return corners
 }
 
-func PerpendicularVectorFromSegmentToPoint(segment Segment_s, point Vector_s) Vector_s {
+func SegmentDirection(s Segment_s) Vector_s {
+	return VectorSub(s.End, s.Start)
+}
+
+func PerpendicularVectorFromLineToPoint(segment Segment_s, point Vector_s) Vector_s {
 	var a Vector_s = VectorSub(point, segment.Start)
 	var b Vector_s = VectorSub(segment.End, segment.Start)
 	return VectorRejection(a, b)
