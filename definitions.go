@@ -29,6 +29,8 @@ type Ball_s struct {
 type Input_s struct {
 	IsUpArrowClicked   bool
 	IsDownArrowClicked bool
+	IsWClicked         bool
+	IsSClicked         bool
 	IsWindowClosed     bool
 }
 

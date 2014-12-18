@@ -13,8 +13,8 @@ var (
 	CURRENT_FRAME_START_TIME time.Time
 	CURRENT_FRAME_DURATION   time.Duration
 	PADDLE_OFFSET            float64
-	PLAYER                   Paddle_s
-	AI                       Paddle_s
+	PLAYER_1                 Paddle_s
+	PLAYER_2                 Paddle_s
 	BALL                     Ball_s
 	INPUT                    Input_s
 )

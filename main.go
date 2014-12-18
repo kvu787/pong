@@ -24,7 +24,7 @@ func main() {
 	FRAME_DURATION = SecondsToDuration(1.0 / float64(FPS))
 	CURRENT_FRAME_START_TIME = time.Now()
 	PADDLE_OFFSET = 60
-	PLAYER =
+	PLAYER_1 =
 		Paddle_s{
 			Rectangle: Rectangle_s{
 				Position: Vector_s{
@@ -33,7 +33,7 @@ func main() {
 				Width:  10,
 				Height: 80},
 			Speed: 500}
-	AI =
+	PLAYER_2 =
 		Paddle_s{
 			Rectangle: Rectangle_s{
 				Position: Vector_s{
@@ -41,7 +41,7 @@ func main() {
 					Y: WINDOW.Height / 2},
 				Width:  10,
 				Height: 80},
-			Speed: 300}
+			Speed: 500}
 	BALL =
 		Ball_s{
 			Circle: Circle_s{
@@ -54,6 +54,8 @@ func main() {
 		Input_s{
 			IsUpArrowClicked:   false,
 			IsDownArrowClicked: false,
+			IsWClicked:         false,
+			IsSClicked:         false,
 			IsWindowClosed:     false}
 
 	runtime.LockOSThread()
@@ -71,18 +73,19 @@ func main() {
 		HandleWindowClose(INPUT)
 
 		// update game objects
-		PLAYER = MovePlayer(INPUT, FRAME_DURATION, PLAYER)
-		PLAYER = KeepPlayerInBoundary(PLAYER, WINDOW)
-		AI = MoveAi(AI, BALL, FRAME_DURATION)
-		BALL = CollidePaddleBall(PLAYER, BALL, 4, DegreesToRadians(20.0))
-		BALL = CollidePaddleBall(AI, BALL, 4, DegreesToRadians(20.0))
+		PLAYER_1 = MovePlayer(INPUT, FRAME_DURATION, PLAYER_1, 1)
+		PLAYER_1 = KeepPlayerInBoundary(PLAYER_1, WINDOW)
+		PLAYER_2 = MovePlayer(INPUT, FRAME_DURATION, PLAYER_2, 2)
+		PLAYER_2 = KeepPlayerInBoundary(PLAYER_2, WINDOW)
+		BALL = CollidePaddleBall(PLAYER_1, BALL, 4, DegreesToRadians(20.0))
+		BALL = CollidePaddleBall(PLAYER_2, BALL, 4, DegreesToRadians(20.0))
 		BALL = CollideBoundaryBall(WINDOW, BALL)
 		BALL = ApplyVelocityBall(BALL, FRAME_DURATION)
 
 		// rendering
 		ClearWindow(Color_s{0, 0, 0, 255}, SF_WINDOW)
-		RenderRectangle(PLAYER.Rectangle, SF_WINDOW)
-		RenderRectangle(AI.Rectangle, SF_WINDOW)
+		RenderRectangle(PLAYER_1.Rectangle, SF_WINDOW)
+		RenderRectangle(PLAYER_2.Rectangle, SF_WINDOW)
 		RenderCircle(BALL.Circle, SF_WINDOW)
 		DisplayWindow(SF_WINDOW)
 

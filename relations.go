@@ -19,6 +19,10 @@ func UpdateInput(sfWindow *sf.RenderWindow, input Input_s) Input_s {
 				input.IsDownArrowClicked = true
 			case sf.KeyUp:
 				input.IsUpArrowClicked = true
+			case sf.KeyW:
+				input.IsWClicked = true
+			case sf.KeyS:
+				input.IsSClicked = true
 			}
 		case sf.EventKeyReleased:
 			switch e.Code {
@@ -26,6 +30,10 @@ func UpdateInput(sfWindow *sf.RenderWindow, input Input_s) Input_s {
 				input.IsDownArrowClicked = false
 			case sf.KeyUp:
 				input.IsUpArrowClicked = false
+			case sf.KeyW:
+				input.IsWClicked = false
+			case sf.KeyS:
+				input.IsSClicked = false
 			}
 		case sf.EventClosed:
 			input.IsWindowClosed = true
@@ -35,9 +43,20 @@ func UpdateInput(sfWindow *sf.RenderWindow, input Input_s) Input_s {
 	return input
 }
 
-func MovePlayer(input Input_s, duration time.Duration, player Paddle_s) Paddle_s {
-	var up bool = input.IsUpArrowClicked
-	var down bool = input.IsDownArrowClicked
+func MovePlayer(input Input_s, duration time.Duration, player Paddle_s, playerNumber int) Paddle_s {
+	var up bool
+	var down bool
+
+	if playerNumber == 1 {
+		up = input.IsWClicked
+		down = input.IsSClicked
+	} else if playerNumber == 2 {
+		up = input.IsUpArrowClicked
+		down = input.IsDownArrowClicked
+	} else {
+		panic("MovePlayer: invalid player number")
+	}
+
 	var position Vector_s = player.Rectangle.Position
 
 	if up && !down {
