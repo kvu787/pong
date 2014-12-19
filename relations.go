@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math/rand"
 	"os"
 	"time"
 
@@ -96,7 +95,7 @@ func Sleep(frameDuration time.Duration, currentFrameDuration time.Duration) {
 	time.Sleep(sleepDuration)
 }
 
-func CollidePaddleBall(player Paddle_s, ball Ball_s, offset float64, angleVarianceRange float64) Ball_s {
+func CollidePaddleBall(player Paddle_s, ball Ball_s) Ball_s {
 	var paddleSides [4]Segment_s = RectangleSegments(player.Rectangle)
 	var i int
 	for i = 0; i < 4; i++ {
@@ -104,25 +103,29 @@ func CollidePaddleBall(player Paddle_s, ball Ball_s, offset float64, angleVarian
 		if AreRectangleSegmentIntersecting(ball.Rectangle, paddleSide) {
 			if i%2 == 0 {
 				// long sides
+
+				// reflect angle depends on what part of paddle is hit
 				var resultant Vector_s = something(paddleSide, ball.Rectangle.Position)
 				resultant = VectorScale(VectorMagnitude(ball.Velocity), resultant)
 				ball.Velocity = resultant
 			} else {
 				// short sides
 
+				// just reflect the ball
 				ball.Velocity = VectorMul(-1, ball.Velocity)
-
-				// randomize velocity direction
-				var offset float64 = (rand.Float64() * DegreesToRadians(160)) - DegreesToRadians(80)
-				var rejection = PerpendicularVectorFromLineToPoint(paddleSide, ball.Rectangle.Position)
-				rejection = VectorScale(VectorMagnitude(ball.Velocity), rejection)
-				rejection = VectorRotate(rejection, offset)
-				ball.Velocity = rejection
 			}
 
 			// separate the segment and the ball
 			// move the ball to its previous position
 			ball.Rectangle.Position = ball.PreviousPosition
+
+			// accelerate ball
+			ball.Velocity = NewPolar(
+				Clamp(0, VectorMagnitude(ball.Velocity)+BALL_ACCELERATION, BALL_MAX_VELOCITY),
+				VectorAngle(ball.Velocity))
+
+			// only collide with one side
+			break
 		}
 	}
 	return ball
@@ -162,6 +165,9 @@ func CollideBoundaryBall(window Rectangle_s, ball Ball_s, p1Score int, p2Score i
 			} else if i == 2 {
 				hasP2Scored = true
 			}
+
+			// only collide with one side
+			break
 		}
 	}
 	if hasP1Scored {
@@ -193,7 +199,7 @@ func HandleGameReset(hasScored bool, ball Ball_s, window Rectangle_s) Ball_s {
 					Y: WINDOW.Height / 2},
 				Width:  10,
 				Height: 10},
-			Velocity: NewPolar(300, GenerateRandomBallDirection())}
+			Velocity: NewPolar(BALL_START_VELOCITY, GenerateRandomBallDirection())}
 	} else {
 		return ball
 	}

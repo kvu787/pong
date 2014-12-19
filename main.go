@@ -14,6 +14,9 @@ func main() {
 	/*** LOAD DATA ***/
 	/*****************/
 
+	BALL_START_VELOCITY = 350
+	BALL_MAX_VELOCITY = 750
+	BALL_ACCELERATION = 20
 	WINDOW = Rectangle_s{
 		Position: Vector_s{X: 400, Y: 300},
 		Width:    800,
@@ -50,7 +53,7 @@ func main() {
 					Y: WINDOW.Height / 2},
 				Width:  10,
 				Height: 10},
-			Velocity: NewPolar(300, GenerateRandomBallDirection())}
+			Velocity: NewPolar(BALL_START_VELOCITY, DegreesToRadians(173.5))}
 	INPUT =
 		Input_s{
 			IsUpArrowClicked:   false,
@@ -81,8 +84,8 @@ func main() {
 		PLAYER_1 = KeepPlayerInBoundary(PLAYER_1, WINDOW)
 		PLAYER_2 = MovePlayer(INPUT, FRAME_DURATION, PLAYER_2, 2)
 		PLAYER_2 = KeepPlayerInBoundary(PLAYER_2, WINDOW)
-		BALL = CollidePaddleBall(PLAYER_1, BALL, 4, DegreesToRadians(20.0))
-		BALL = CollidePaddleBall(PLAYER_2, BALL, 4, DegreesToRadians(20.0))
+		BALL = CollidePaddleBall(PLAYER_1, BALL)
+		BALL = CollidePaddleBall(PLAYER_2, BALL)
 		BALL, PLAYER_1_SCORE, PLAYER_2_SCORE, HAS_SCORED =
 			CollideBoundaryBall(WINDOW, BALL, PLAYER_1_SCORE, PLAYER_2_SCORE)
 		BALL = ApplyVelocityBall(BALL, FRAME_DURATION)

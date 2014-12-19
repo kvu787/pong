@@ -6,6 +6,9 @@ import (
 )
 
 var (
+	BALL_MAX_VELOCITY        float64
+	BALL_START_VELOCITY      float64
+	BALL_ACCELERATION        float64
 	WINDOW                   Rectangle_s
 	SF_WINDOW                *sf.RenderWindow
 	FPS                      float64
