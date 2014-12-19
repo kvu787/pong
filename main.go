@@ -104,6 +104,7 @@ func main() {
 		RenderRectangle(PLAYER_1.Rectangle, SF_WINDOW)
 		RenderRectangle(PLAYER_2.Rectangle, SF_WINDOW)
 		RenderRectangle(BALL.Rectangle, SF_WINDOW)
+		RenderCenterLine(WINDOW, SF_WINDOW)
 		DisplayWindow(SF_WINDOW)
 
 		// handle timing

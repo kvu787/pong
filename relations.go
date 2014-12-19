@@ -209,3 +209,13 @@ func HandleGameReset(hasScored bool, ball Ball_s, window Rectangle_s) Ball_s {
 		return ball
 	}
 }
+
+func RenderCenterLine(window Rectangle_s, sfWindow *sf.RenderWindow) {
+	var r Rectangle_s = Rectangle_s{
+		Position: Vector_s{
+			X: WINDOW.Width / 2,
+			Y: WINDOW.Height / 2},
+		Width:  3,
+		Height: WINDOW.Height}
+	RenderRectangle(r, sfWindow)
+}
