@@ -95,12 +95,14 @@ func Sleep(frameDuration time.Duration, currentFrameDuration time.Duration) {
 	time.Sleep(sleepDuration)
 }
 
-func CollidePaddleBall(player Paddle_s, ball Ball_s) Ball_s {
+func CollidePaddleBall(player Paddle_s, ball Ball_s) (Ball_s, bool) {
 	var paddleSides [4]Segment_s = RectangleSegments(player.Rectangle)
 	var i int
+	var hasHitPaddle bool = false
 	for i = 0; i < 4; i++ {
 		var paddleSide Segment_s = paddleSides[i]
 		if AreRectangleSegmentIntersecting(ball.Rectangle, paddleSide) {
+			hasHitPaddle = true
 			if i%2 == 0 {
 				// long sides
 
@@ -128,7 +130,7 @@ func CollidePaddleBall(player Paddle_s, ball Ball_s) Ball_s {
 			break
 		}
 	}
-	return ball
+	return ball, hasHitPaddle
 }
 
 func something(s Segment_s, p Vector_s) Vector_s {
@@ -218,4 +220,13 @@ func RenderCenterLine(window Rectangle_s, sfWindow *sf.RenderWindow) {
 		Width:  3,
 		Height: WINDOW.Height}
 	RenderRectangle(r, sfWindow)
+}
+
+func ClampBall(ball Ball_s, player1 Paddle_s, player2 Paddle_s) Ball_s {
+	var padding float64 = player1.Rectangle.Width/2 + ball.Rectangle.Width/2 + 2
+	ball.Rectangle.Position.X = Clamp(
+		player1.Rectangle.Position.X+padding,
+		ball.Rectangle.Position.X,
+		player2.Rectangle.Position.X-padding)
+	return ball
 }

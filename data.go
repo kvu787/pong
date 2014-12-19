@@ -23,4 +23,6 @@ var (
 	PLAYER_1_SCORE           int
 	PLAYER_2_SCORE           int
 	HAS_SCORED               bool
+	HAS_HIT_PADDLE_1         bool
+	HAS_HIT_PADDLE_2         bool
 )

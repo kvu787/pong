@@ -64,6 +64,8 @@ func main() {
 	PLAYER_1_SCORE = 0
 	PLAYER_2_SCORE = 0
 	HAS_SCORED = false
+	HAS_HIT_PADDLE_1 = false
+	HAS_HIT_PADDLE_2 = false
 
 	runtime.LockOSThread()
 
@@ -84,8 +86,11 @@ func main() {
 		PLAYER_1 = KeepPlayerInBoundary(PLAYER_1, WINDOW)
 		PLAYER_2 = MovePlayer(INPUT, FRAME_DURATION, PLAYER_2, 2)
 		PLAYER_2 = KeepPlayerInBoundary(PLAYER_2, WINDOW)
-		BALL = CollidePaddleBall(PLAYER_1, BALL)
-		BALL = CollidePaddleBall(PLAYER_2, BALL)
+		BALL, HAS_HIT_PADDLE_1 = CollidePaddleBall(PLAYER_1, BALL)
+		BALL, HAS_HIT_PADDLE_2 = CollidePaddleBall(PLAYER_2, BALL)
+		if HAS_HIT_PADDLE_1 || HAS_HIT_PADDLE_2 {
+			BALL = ClampBall(BALL, PLAYER_1, PLAYER_2)
+		}
 		BALL, PLAYER_1_SCORE, PLAYER_2_SCORE, HAS_SCORED =
 			CollideBoundaryBall(WINDOW, BALL, PLAYER_1_SCORE, PLAYER_2_SCORE)
 		BALL = ApplyVelocityBall(BALL, FRAME_DURATION)
