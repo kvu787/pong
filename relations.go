@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -229,4 +230,31 @@ func ClampBall(ball Ball_s, player1 Paddle_s, player2 Paddle_s) Ball_s {
 		ball.Rectangle.Position.X,
 		player2.Rectangle.Position.X-padding)
 	return ball
+}
+
+func RenderScores(player1Score int, player2Score int, window Rectangle_s, sfWindow *sf.RenderWindow) {
+	f, err := sf.NewFontFromFile("DroidSansMono.ttf")
+	if err != nil {
+		panic("could not load font")
+	}
+
+	t, err := sf.NewText(f)
+	if err != nil {
+		panic("could not create text object")
+	}
+	t.SetString(fmt.Sprintf("%d", player1Score))
+	t.SetCharacterSize(50)
+	t.SetPosition(sf.Vector2f{13, 10})
+	t.SetColor(sf.Color{255, 255, 255, 255})
+	SF_WINDOW.Draw(t, sf.DefaultRenderStates())
+
+	t, err = sf.NewText(f)
+	if err != nil {
+		panic("could not create text object")
+	}
+	t.SetString(fmt.Sprintf("%d", player2Score))
+	t.SetCharacterSize(50)
+	t.SetPosition(sf.Vector2f{float32(window.Width/2.0 + 15), 10})
+	t.SetColor(sf.Color{255, 255, 255, 255})
+	SF_WINDOW.Draw(t, sf.DefaultRenderStates())
 }

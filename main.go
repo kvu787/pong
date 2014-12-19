@@ -106,10 +106,12 @@ func main() {
 		} else {
 			ClearWindow(Color_s{0, 0, 0, 255}, SF_WINDOW)
 		}
+
 		RenderRectangle(PLAYER_1.Rectangle, SF_WINDOW)
 		RenderRectangle(PLAYER_2.Rectangle, SF_WINDOW)
 		RenderRectangle(BALL.Rectangle, SF_WINDOW)
 		RenderCenterLine(WINDOW, SF_WINDOW)
+		RenderScores(PLAYER_1_SCORE, PLAYER_2_SCORE, WINDOW, SF_WINDOW)
 		DisplayWindow(SF_WINDOW)
 
 		// handle timing
