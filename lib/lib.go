@@ -16,7 +16,3 @@ func IsPointInsideCircle(px, py, cx, cy, rad float64) bool {
 	center := Vector_s{cx, cy}
 	return VectorMagnitude(VectorSub(point, center)) <= rad
 }
-
-func DoesSegmentIntersectSegment(s1x, s1y, s2x, s2y float64) bool {
-
-}
