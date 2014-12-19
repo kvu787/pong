@@ -155,8 +155,13 @@ func CollideBoundaryBall(window Rectangle_s, ball Ball_s, p1Score int, p2Score i
 	for i = 0; i < 4; i++ {
 		var boundarySide Segment_s = boundarySides[i]
 		if AreRectangleSegmentIntersecting(ball.Rectangle, boundarySide) {
+
+			// reflect ball on boundary
 			var boundaryVector = VectorSub(boundarySide.End, boundarySide.Start)
 			ball.Velocity = Reflect(ball.Velocity, boundaryVector)
+			ball.Rectangle.Position = ball.PreviousPosition
+
+			// separate
 			ball.Rectangle.Position = ball.PreviousPosition
 
 			// handle scoring

@@ -23,7 +23,7 @@ func main() {
 		Height:   600,
 	}
 	SF_WINDOW = SetupWindow(int(WINDOW.Width), int(WINDOW.Height))
-	FPS = 120
+	FPS = 65
 	FRAME_DURATION = SecondsToDuration(1.0 / float64(FPS))
 	CURRENT_FRAME_START_TIME = time.Now()
 	PADDLE_OFFSET = 60
@@ -96,7 +96,11 @@ func main() {
 		BALL = HandleGameReset(HAS_SCORED, BALL, WINDOW)
 
 		// rendering
-		ClearWindow(Color_s{0, 0, 0, 255}, SF_WINDOW)
+		if HAS_SCORED {
+			ClearWindow(Color_s{30, 30, 30, 255}, SF_WINDOW)
+		} else {
+			ClearWindow(Color_s{0, 0, 0, 255}, SF_WINDOW)
+		}
 		RenderRectangle(PLAYER_1.Rectangle, SF_WINDOW)
 		RenderRectangle(PLAYER_2.Rectangle, SF_WINDOW)
 		RenderRectangle(BALL.Rectangle, SF_WINDOW)
