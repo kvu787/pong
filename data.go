@@ -17,4 +17,7 @@ var (
 	PLAYER_2                 Paddle_s
 	BALL                     Ball_s
 	INPUT                    Input_s
+	PLAYER_1_SCORE           int
+	PLAYER_2_SCORE           int
+	HAS_SCORED               bool
 )

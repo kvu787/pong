@@ -1,7 +1,7 @@
 package main
 
 import (
-	"math"
+	"fmt"
 	"runtime"
 	"time"
 )
@@ -44,12 +44,13 @@ func main() {
 			Speed: 500}
 	BALL =
 		Ball_s{
-			Circle: Circle_s{
+			Rectangle: Rectangle_s{
 				Position: Vector_s{
 					X: WINDOW.Width / 2,
 					Y: WINDOW.Height / 2},
-				Radius: 5},
-			Velocity: NewPolar(700, math.Pi*0.05)}
+				Width:  10,
+				Height: 10},
+			Velocity: NewPolar(300, GenerateRandomBallDirection())}
 	INPUT =
 		Input_s{
 			IsUpArrowClicked:   false,
@@ -57,6 +58,9 @@ func main() {
 			IsWClicked:         false,
 			IsSClicked:         false,
 			IsWindowClosed:     false}
+	PLAYER_1_SCORE = 0
+	PLAYER_2_SCORE = 0
+	HAS_SCORED = false
 
 	runtime.LockOSThread()
 
@@ -79,14 +83,20 @@ func main() {
 		PLAYER_2 = KeepPlayerInBoundary(PLAYER_2, WINDOW)
 		BALL = CollidePaddleBall(PLAYER_1, BALL, 4, DegreesToRadians(20.0))
 		BALL = CollidePaddleBall(PLAYER_2, BALL, 4, DegreesToRadians(20.0))
-		BALL = CollideBoundaryBall(WINDOW, BALL)
+		BALL, PLAYER_1_SCORE, PLAYER_2_SCORE, HAS_SCORED =
+			CollideBoundaryBall(WINDOW, BALL, PLAYER_1_SCORE, PLAYER_2_SCORE)
 		BALL = ApplyVelocityBall(BALL, FRAME_DURATION)
+		BALL = UpdatePreviousPosition(BALL)
+		if HAS_SCORED {
+			fmt.Printf("score! p1: %d, p2: %d\n", PLAYER_1_SCORE, PLAYER_2_SCORE)
+		}
+		BALL = HandleGameReset(HAS_SCORED, BALL, WINDOW)
 
 		// rendering
 		ClearWindow(Color_s{0, 0, 0, 255}, SF_WINDOW)
 		RenderRectangle(PLAYER_1.Rectangle, SF_WINDOW)
 		RenderRectangle(PLAYER_2.Rectangle, SF_WINDOW)
-		RenderCircle(BALL.Circle, SF_WINDOW)
+		RenderRectangle(BALL.Rectangle, SF_WINDOW)
 		DisplayWindow(SF_WINDOW)
 
 		// handle timing
@@ -94,10 +104,3 @@ func main() {
 		Sleep(FRAME_DURATION, CURRENT_FRAME_DURATION)
 	}
 }
-
-/* Pong collision model 3
-
-if paddle is ball_diameter away from the boundary
-after collisions, the ball must be CLEAR of the danger zone
-
-*/

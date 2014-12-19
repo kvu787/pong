@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"math/rand"
 	"time"
 
 	sf "bitbucket.org/kvu787/gosfml2"
@@ -80,6 +81,71 @@ func DegreesToRadians(deg float64) float64 {
 /*** INTERSECTIONS ***/
 /*********************/
 
+func AreRectangleSegmentIntersecting(r Rectangle_s, s Segment_s) bool {
+	var segments [4]Segment_s = RectangleSegments(r)
+	var i int
+
+	for i = 0; i < 4; i++ {
+		if AreSegmentsIntersecting(s, segments[i]) {
+			return true
+		}
+	}
+	return false
+}
+
+func AreSegmentsIntersecting(s1 Segment_s, s2 Segment_s) bool {
+	// check if each segment's endpoints are on opposite sides
+	// use cross product to check 'sidedness'
+
+	var a Vector_s // segment vector
+	var b Vector_s // endpoint vector 1
+	var c Vector_s // endpoint vector 2
+	var xp1 float64
+	var xp2 float64
+
+	// use s1 as line
+	a = VectorSub(s1.End, s1.Start)
+	b = VectorSub(s2.Start, s1.Start)
+	c = VectorSub(s2.End, s1.Start)
+	xp1 = VectorCrossProduct(a, b)
+	xp2 = VectorCrossProduct(a, c)
+
+	if (xp1 < 0) == (xp2 < 0) {
+		return false
+	}
+
+	// use s2 as line
+	a = VectorSub(s2.End, s2.Start)
+	b = VectorSub(s1.Start, s2.Start)
+	c = VectorSub(s1.End, s2.Start)
+	xp1 = VectorCrossProduct(a, b)
+	xp2 = VectorCrossProduct(a, c)
+
+	return (xp1 < 0) != (xp2 < 0)
+}
+
+func AreRectanglesIntersecting(r1 Rectangle_s, r2 Rectangle_s) bool {
+	// assume position is rectangle center
+
+	if IsPointInsideRectangle(r1.Position, r2) || IsPointInsideRectangle(r2.Position, r1) {
+		return true
+	}
+
+	var segments1 [4]Segment_s = RectangleSegments(r1)
+	var segments2 [4]Segment_s = RectangleSegments(r2)
+	var i int
+	var j int
+	for i = 0; i < 4; i++ {
+		for j = 0; j < 4; j++ {
+			if AreSegmentsIntersecting(segments1[i], segments2[j]) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func AreRectangleCircleIntersecting(r Rectangle_s, c Circle_s) bool {
 	var segments [4]Segment_s = RectangleSegments(r)
 	var i int
@@ -132,6 +198,16 @@ func IsPointInsideRectangle(v Vector_s, r Rectangle_s) bool {
 /************/
 /*** MISC ***/
 /************/
+
+func GenerateRandomBallDirection() float64 {
+	var spread float64 = DegreesToRadians(75)
+	var a float64 = spread * (-0.5 + rand.Float64())
+	if rand.Float64() > 0.5 {
+		return a + math.Pi
+	} else {
+		return a
+	}
+}
 
 func NormalizeScalar(k float64) float64 {
 	return k / math.Abs(k)

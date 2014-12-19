@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math"
 	"math/rand"
 	"os"
 	"time"
@@ -102,11 +101,10 @@ func CollidePaddleBall(player Paddle_s, ball Ball_s, offset float64, angleVarian
 	var i int
 	for i = 0; i < 4; i++ {
 		var paddleSide Segment_s = paddleSides[i]
-		if AreCircleSegmentIntersecting(ball.Circle, paddleSide) {
+		if AreRectangleSegmentIntersecting(ball.Rectangle, paddleSide) {
 			if i%2 == 0 {
 				// long sides
-
-				var resultant Vector_s = something(paddleSide, ball.Circle.Position)
+				var resultant Vector_s = something(paddleSide, ball.Rectangle.Position)
 				resultant = VectorScale(VectorMagnitude(ball.Velocity), resultant)
 				ball.Velocity = resultant
 			} else {
@@ -116,23 +114,22 @@ func CollidePaddleBall(player Paddle_s, ball Ball_s, offset float64, angleVarian
 
 				// randomize velocity direction
 				var offset float64 = (rand.Float64() * DegreesToRadians(160)) - DegreesToRadians(80)
-				var rejection = PerpendicularVectorFromLineToPoint(paddleSide, ball.Circle.Position)
+				var rejection = PerpendicularVectorFromLineToPoint(paddleSide, ball.Rectangle.Position)
 				rejection = VectorScale(VectorMagnitude(ball.Velocity), rejection)
 				rejection = VectorRotate(rejection, offset)
 				ball.Velocity = rejection
 			}
 
-			// separate the segment and the circle
-			var perpendicular Vector_s = PerpendicularVectorFromLineToPoint(paddleSide, ball.Circle.Position)
-			var separation float64 = ball.Circle.Radius - VectorMagnitude(perpendicular)
-			ball.Circle.Position = VectorAdd(ball.Circle.Position, VectorScale(separation+offset, perpendicular))
+			// separate the segment and the ball
+			// move the ball to its previous position
+			ball.Rectangle.Position = ball.PreviousPosition
 		}
 	}
 	return ball
 }
 
 func something(s Segment_s, p Vector_s) Vector_s {
-	var offsets [8]float64 = [8]float64{20, 40, 60, 80, 100, 120, 140, 160}
+	var offsets [8]float64 = [8]float64{45, 57.86, 70.71, 83.57, 96.43, 109.29, 122.14, 135}
 	var endpoint Vector_s = s.Start
 	var segmentVector = VectorSub(s.Start, s.End)
 	var b Vector_s = PerpendicularVectorFromLineToPoint(s, p)
@@ -140,38 +137,64 @@ func something(s Segment_s, p Vector_s) Vector_s {
 	var distanceFromEnd float64 = VectorMagnitude(VectorSub(pointOnLine, endpoint))
 	var sectionLength float64 = SegmentLength(s) / float64(len(offsets))
 	var offsetIndex int = Floor(distanceFromEnd / sectionLength)
+	if offsetIndex >= len(offsets) {
+		offsetIndex = len(offsets) - 1
+	}
 	var xProduct float64 = NormalizeScalar(VectorCrossProduct(segmentVector, b))
 	return VectorNormalize(VectorRotate(segmentVector, xProduct*DegreesToRadians(offsets[offsetIndex])))
 }
 
-func CollideBoundaryBall(window Rectangle_s, ball Ball_s) Ball_s {
+func CollideBoundaryBall(window Rectangle_s, ball Ball_s, p1Score int, p2Score int) (Ball_s, int, int, bool) {
 	var boundarySides [4]Segment_s = RectangleSegments(window)
+	var hasP1Scored bool = false
+	var hasP2Scored bool = false
 	var i int
 	for i = 0; i < 4; i++ {
 		var boundarySide Segment_s = boundarySides[i]
-		if AreCircleSegmentIntersecting(ball.Circle, boundarySide) {
+		if AreRectangleSegmentIntersecting(ball.Rectangle, boundarySide) {
 			var boundaryVector = VectorSub(boundarySide.End, boundarySide.Start)
 			ball.Velocity = Reflect(ball.Velocity, boundaryVector)
+			ball.Rectangle.Position = ball.PreviousPosition
+
+			// handle scoring
+			if i == 0 {
+				hasP1Scored = true
+			} else if i == 2 {
+				hasP2Scored = true
+			}
 		}
 	}
-	return ball
+	if hasP1Scored {
+		return ball, p1Score + 1, p2Score, true
+	} else if hasP2Scored {
+		return ball, p1Score, p2Score + 1, true
+	} else {
+		return ball, p1Score, p2Score, false
+	}
 }
 
 func ApplyVelocityBall(ball Ball_s, duration time.Duration) Ball_s {
 	var displacement Vector_s = VectorMul(duration.Seconds(), ball.Velocity)
-	ball.Circle.Position = VectorAdd(displacement, ball.Circle.Position)
+	ball.Rectangle.Position = VectorAdd(displacement, ball.Rectangle.Position)
 	return ball
 }
 
-func MoveAi(ai Paddle_s, ball Ball_s, duration time.Duration) Paddle_s {
-	var fromAiToBallY float64 = VectorSub(ball.Circle.Position, ai.Rectangle.Position).Y
-	var maxDisplacement float64 = ai.Speed * duration.Seconds()
-	var displacementFromBall float64 = math.Abs(ball.Circle.Position.Y - ai.Rectangle.Position.Y)
-	var displacement float64 = math.Min(maxDisplacement, displacementFromBall)
-	if fromAiToBallY < 0 {
-		ai.Rectangle.Position.Y -= displacement
-	} else if fromAiToBallY > 0 {
-		ai.Rectangle.Position.Y += displacement
+func UpdatePreviousPosition(ball Ball_s) Ball_s {
+	ball.PreviousPosition = ball.Rectangle.Position
+	return ball
+}
+
+func HandleGameReset(hasScored bool, ball Ball_s, window Rectangle_s) Ball_s {
+	if hasScored {
+		return Ball_s{
+			Rectangle: Rectangle_s{
+				Position: Vector_s{
+					X: WINDOW.Width / 2,
+					Y: WINDOW.Height / 2},
+				Width:  10,
+				Height: 10},
+			Velocity: NewPolar(300, GenerateRandomBallDirection())}
+	} else {
+		return ball
 	}
-	return ai
 }

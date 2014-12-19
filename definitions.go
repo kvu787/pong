@@ -22,8 +22,9 @@ type Paddle_s struct {
 }
 
 type Ball_s struct {
-	Circle   Circle_s
-	Velocity Vector_s
+	Rectangle        Rectangle_s
+	Velocity         Vector_s
+	PreviousPosition Vector_s
 }
 
 type Input_s struct {
